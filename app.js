@@ -38,7 +38,7 @@ function normalizeTitleCase(str) {
   for (let i = 0; i < words.length; i++) {
     const word = words[i].trim();
     if (word !== "") {
-      const capitalized = word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+      const capitalized = word[0].toUpperCase() + word.slice(1).toLowerCase();
       cleanWords.push(capitalized);
     }
   }
@@ -62,7 +62,7 @@ function validateBookingCode(code) {
     return "Độ dài nhỏ hơn 6 ký tự";
   }
   if (!code.startsWith("CIN-")) {
-    return "Sai tiền tố \"CIN-\"";
+    return 'Sai tiền tố "CIN-"';
   }
   if (code.includes(" ")) {
     return "Chứa khoảng trắng";
@@ -81,7 +81,7 @@ function inputPositiveInteger(message) {
     }
     const trimmed = input.trim();
     const num = Number(trimmed);
-    if (trimmed !== "" && Number.isInteger(num) && num > 0) {
+    if (trimmed !== "" && !isNaN(num) && num > 0 && num % 1 === 0) {
       return num;
     }
     console.log("Giá trị phải là số nguyên lớn hơn 0, vui lòng nhập lại");
@@ -307,73 +307,69 @@ function printSummaryReport() {
 
     const averageRevenue = Math.round(totalRevenue / bookings.length);
 
-    console.log(`Tổng số đơn đặt vé\t: ${bookings.length}`);
-    console.log(`Tổng doanh thu\t\t: ${formatCurrency(totalRevenue)}`);
-    console.log(`Doanh thu trung bình\t: ${formatCurrency(averageRevenue)}`);
-    console.log(`Đơn cao nhất\t\t: ${maxBooking.bookingCode} - ${formatCurrency(maxBooking.totalAmount)}`);
+    console.log(`Tổng số đơn đặt vé: ${bookings.length}`);
+    console.log(`Tổng doanh thu: ${formatCurrency(totalRevenue)}`);
+    console.log(`Doanh thu trung bình: ${formatCurrency(averageRevenue)}`);
+    console.log(`Đơn cao nhất: ${maxBooking.bookingCode} - ${formatCurrency(maxBooking.totalAmount)}`);
   }
   console.log("==================================================");
   console.log("Cảm ơn bạn đã sử dụng hệ thống. Tạm biệt.");
 }
 
-function startProgram() {
-  while (true) {
-    console.log("=====================================================");
-    console.log("     HỆ THỐNG QUẢN LÝ ĐẶT VÉ MOONLIGHT CINEMA        ");
-    console.log("=====================================================");
-    console.log("1. Hiển thị danh sách đơn đặt vé");
-    console.log("2. Thêm đơn đặt vé mới");
-    console.log("3. Cập nhật đơn đặt vé");
-    console.log("4. Xóa đơn đặt vé");
-    console.log("5. Tìm kiếm đơn đặt vé theo tên phim");
-    console.log("0. Thoát chương trình");
-    console.log("=====================================================");
+let choice = -1;
+do {
+  console.log("=====================================================");
+  console.log("     HỆ THỐNG QUẢN LÝ ĐẶT VÉ MOONLIGHT CINEMA        ");
+  console.log("=====================================================");
+  console.log("1. Hiển thị danh sách đơn đặt vé");
+  console.log("2. Thêm đơn đặt vé mới");
+  console.log("3. Cập nhật đơn đặt vé");
+  console.log("4. Xóa đơn đặt vé");
+  console.log("5. Tìm kiếm đơn đặt vé theo tên phim");
+  console.log("0. Thoát chương trình");
+  console.log("=====================================================");
 
-    const choiceInput = prompt("Vui lòng nhập lựa chọn của bạn (0 - 5):");
-    if (choiceInput === null) {
+  const choiceInput = prompt("Vui lòng nhập lựa chọn của bạn (0 - 5):");
+  if (choiceInput === null) {
+    console.log("Lựa chọn không hợp lệ, vui lòng nhập số từ 0 đến 5");
+    continue;
+  }
+
+  const choiceString = choiceInput.trim();
+  choice = Number(choiceString);
+  if (choiceString === "" || isNaN(choice) || choice < 0 || choice > 5 || choice % 1 !== 0) {
+    console.log("Lựa chọn không hợp lệ, vui lòng nhập số từ 0 đến 5");
+    continue;
+  }
+
+  switch (choice) {
+    case 1: {
+      handleDisplayBookings();
+      break;
+    }
+    case 2: {
+      handleAddBooking();
+      break;
+    }
+    case 3: {
+      handleUpdateBooking();
+      break;
+    }
+    case 4: {
+      handleDeleteBooking();
+      break;
+    }
+    case 5: {
+      handleSearchBookings();
+      break;
+    }
+    case 0: {
+      printSummaryReport();
+      break;
+    }
+    default: {
       console.log("Lựa chọn không hợp lệ, vui lòng nhập số từ 0 đến 5");
-      continue;
-    }
-
-    const choiceString = choiceInput.trim();
-    if (choiceString === "" || !Number.isInteger(Number(choiceString))) {
-      console.log("Lựa chọn không hợp lệ");
-      continue;
-    }
-
-    const choice = Number(choiceString);
-
-    switch (choice) {
-      case 1: {
-        handleDisplayBookings();
-        break;
-      }
-      case 2: {
-        handleAddBooking();
-        break;
-      }
-      case 3: {
-        handleUpdateBooking();
-        break;
-      }
-      case 4: {
-        handleDeleteBooking();
-        break;
-      }
-      case 5: {
-        handleSearchBookings();
-        break;
-      }
-      case 0: {
-        printSummaryReport();
-        return;
-      }
-      default: {
-        console.log("Lựa chọn không hợp lệ");
-        break;
-      }
+      break;
     }
   }
-}
-
-startProgram();
+} while (choice !== 0);
